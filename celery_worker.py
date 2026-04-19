@@ -1,4 +1,5 @@
 from celery import Celery
+import time
 
 celery = Celery(
     "brake_tasks",
@@ -8,6 +9,8 @@ celery = Celery(
 
 @celery.task
 def brake_decision(distance):
+    time.sleep(5)  
+
     if distance < 3:
         return "Emergency Brake 🚨"
     elif distance < 6:
