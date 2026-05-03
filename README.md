@@ -1,76 +1,157 @@
-# Brake Decision System (FastAPI + Celery)
+# 🚗 Brake Decision System (FastAPI + Celery)
 
-This project is a simple backend system that decides braking action based on distance input using asynchronous processing.
+A backend system that determines braking action based on distance input using asynchronous task processing.
 
-## Features
-- FastAPI for API endpoints
-- Celery for background task processing
-- Redis as broker and backend
-- Task status tracking using task_id
-- Parallel task execution (Week 5)
+This project uses:
 
-## API Endpoints
+* **FastAPI** for API development
+* **Celery** for background task processing
+* **Redis** as message broker and result backend
+* **Flower** for monitoring tasks
 
-### 1. Home
-GET /
-- Returns: System running message
+## ⚙️ Features
 
-### 2. Trigger Task
-POST /trigger-task
+* FastAPI-based REST API
+* Asynchronous task execution using Celery
+* Parallel processing with multiple workers
+* Retry mechanism for handling failures
+* Real-time monitoring using Flower dashboard
+* One-click project startup using batch script
+
+## 🛠️ Tech Stack
+
+* Python
+* FastAPI
+* Celery
+* Redis
+* Flower
+
+## 🚀 How to Run (Manual)
+
+1. Start Redis server
+2. Run FastAPI:
+
+   uvicorn main:app --reload
+  
+3. Run Celery worker:
+
+   celery -A celery_worker.celery worker --loglevel=info --pool=threads --concurrency=4
+
+4. Run Flower dashboard:
+
+   celery -A celery_worker.celery flower --port=5556
+
+5. Open in browser:
+
+   * FastAPI Docs → http://127.0.0.1:8000/docs
+   * Flower Dashboard → http://localhost:5556
+
+##  Run Project (One Click)
+
+Run:
+
+start_project.bat
+
+
+This will:
+
+* Start FastAPI server
+* Start Celery worker (parallel execution)
+* Start Flower dashboard
+* Open browser automatically
+
+##  API Endpoints
+
+###  Trigger Task
+
+**POST** `/trigger-task`
 
 Request:
+
+```json
 {
   "distance": 2
 }
+```
 
 Response:
+
+```json
 {
-  "task_id": "some_id",
+  "task_id": "xxxx",
   "status": "Processing"
 }
+```
 
-### 3. Get Result
-GET /result/{task_id}
+---
 
-Response:
+###  Get Result
+
+**GET** `/result/{task_id}`
+
+Response (Success):
+
+```json
 {
   "status": "Completed",
   "result": "Emergency Brake 🚨"
 }
+```
 
-## Decision Logic
-- distance < 3 → Emergency Brake 🚨
-- distance < 6 → Slow Down ⚠️
-- distance ≥ 6 → Safe ✅
+Response (Failure):
 
-## Week 5: Parallel Processing
-In this week, multiple Celery workers were run in parallel using:
+```json
+{
+  "status": "Failed",
+  "error": "Sensor Failure"
+}
+```
 
-celery -A celery_worker.celery worker --loglevel=info --pool=threads --concurrency=4
+---
 
-This allows multiple tasks to execute simultaneously instead of one-by-one.
+##  Retry Mechanism
 
-## How to Run
+* If `distance < 0`, system simulates sensor failure
+* Task automatically retries (max 3 times)
+* Uses Celery retry with delay
 
-1. Start Redis
-2. Run FastAPI:
-   uvicorn main:app --reload
-3. Run Celery:
-   celery -A celery_worker.celery worker --loglevel=info --pool=threads --concurrency=4
-4. Open:
-   http://127.0.0.1:8000/docs
-   ## 🚀 Run Project (One Click)
+---
 
-Run:
-start_project.bat
+##  Monitoring
 
-This will:
-- Start FastAPI server
-- Start Celery worker (parallel execution)
-- Start Flower dashboard
-- Open browser automatically
+Flower dashboard allows:
 
-## Outcome
-- Learned async task processing
-- Implemented Celery with FastAPI
-- Executed tasks in parallel
+* Viewing active tasks
+* Tracking retries and failures
+* Monitoring worker performance
+
+---
+
+##  Outcome
+
+* Built asynchronous backend system
+* Implemented task queue using Celery + Redis
+* Enabled parallel task execution
+* Implemented retry mechanism for failure handling
+* Integrated monitoring using Flower
+* Automated full system startup
+
+---
+
+##  Project Structure
+
+```
+python_repository/
+│── main.py
+│── celery_worker.py
+│── start_project.bat
+│── README.md
+│── venv/
+```
+
+---
+
+##  Author
+
+Shraddha Chavan
+
