@@ -10,6 +10,7 @@ celery = Celery(
 @celery.task(bind=True, max_retries=3)
 def brake_decision(self, distance):
     print(f"🚗 Task started with distance: {distance}")
+    print(f"🔁 Retry attempt: {self.request.retries}")  # 👈 ADD THIS LINE
 
     # Simulate failure
     if distance < 0:
