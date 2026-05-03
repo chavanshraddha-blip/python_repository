@@ -59,6 +59,16 @@ This allows multiple tasks to execute simultaneously instead of one-by-one.
    celery -A celery_worker.celery worker --loglevel=info --pool=threads --concurrency=4
 4. Open:
    http://127.0.0.1:8000/docs
+   ## 🚀 Run Project (One Click)
+
+Run:
+start_project.bat
+
+This will:
+- Start FastAPI server
+- Start Celery worker (parallel execution)
+- Start Flower dashboard
+- Open browser automatically
 
 ## Outcome
 - Learned async task processing
