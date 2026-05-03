@@ -5,18 +5,16 @@ from celery_worker import celery, brake_decision
 
 app = FastAPI()
 
-# Input schema
 class DistanceInput(BaseModel):
     distance: float
 
 
-# ✅ Home route (test server)
 @app.get("/")
 def home():
     return {"message": "Brake Decision System Running 🚗"}
 
 
-# ✅ Week 3: Trigger Celery Task
+# Trigger Task
 @app.post("/trigger-task")
 def trigger_task(data: DistanceInput):
     task = brake_decision.delay(data.distance)
@@ -26,25 +24,30 @@ def trigger_task(data: DistanceInput):
     }
 
 
-# ✅ Week 4: Check Task Result
+# Get Result + Retry Info
 @app.get("/result/{task_id}")
 def get_result(task_id: str):
     result = AsyncResult(task_id, app=celery)
 
     if result.state == "PENDING":
-        return {"status": "Processing"}
-    
+        return {"status": "Pending ⏳"}
+
+    elif result.state == "STARTED":
+        return {"status": "Processing 🔄"}
+
+    elif result.state == "RETRY":
+        return {"status": "Retrying 🔁"}
+
     elif result.state == "SUCCESS":
         return {
-            "status": "Completed",
+            "status": "Completed ✅",
             "result": result.result
         }
-    
+
     elif result.state == "FAILURE":
         return {
-            "status": "Failed",
+            "status": "Failed ❌",
             "error": str(result.result)
         }
-    
-    else:
-        return {"status": result.state}
+
+    return {"status": result.state}
